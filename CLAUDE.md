@@ -24,16 +24,15 @@ Follow these rules in every session.
    repos, Documents, Desktop and home folder.
 7. Never run git commit or git push. I do that myself.
 8. Do not write the README. That is mine.
-9. Log every session in AI_USE_LOG.md. Record R version, package
-   versions and the random seed. Write the session log entry last,
-   after I say the session is over. Use three labelled parts:
-   - "Author inputs": my decisions and instructions from this session,
-     in my own words with spelling fixes only, each attributed to me.
-     Never paraphrase them into AI wording or present them as AI work.
+9. Log every session in AI_USE_LOG.md. Write the session log entry
+   last, after I say the session is over. Each entry has three short
+   parts only, at most 10 lines in total:
+   - "Environment": R version, package versions and the random seed.
    - "AI actions": what you did.
    - "Checks": what you verified, including any commits you checked
      and rules you proposed.
-   Show me the entry before creating it.
+   No list of my inputs, no quotes of my messages, no explanations of
+   basics. Show me the entry before creating it.
 10. With every proposal that creates or changes a file, include a ready
     commit summary and description.
 11. Keep replies free of filler. Do not add attribution lines to SPEC.md
