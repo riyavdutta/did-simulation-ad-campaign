@@ -110,6 +110,7 @@ se2_sims <- numeric(n_sims)   # Model 2 standard error of D:Post
 in1_sims <- logical(n_sims)   # Model 1 95% interval contains 10?
 in2_sims <- logical(n_sims)   # Model 2 95% interval contains 10?
 a_sims   <- numeric(n_sims)   # estimator A (week 3 versus week 4)
+gap_sims <- numeric(n_sims)   # pre-campaign gap, advertised minus comparison, weeks 1 to 3
 
 for (i in 1:n_sims) {
   sim <- build_s1_dataset()
@@ -120,6 +121,10 @@ for (i in 1:n_sims) {
      mean(sim$sales[sim$D == 1 & sim$Post == 0])) -
     (mean(sim$sales[sim$D == 0 & sim$Post == 1]) -
      mean(sim$sales[sim$D == 0 & sim$Post == 0]))
+
+  # Pre-campaign gap: advertised minus comparison average, weeks 1 to 3
+  gap_sims[i] <- mean(sim$sales[sim$D == 1 & sim$Post == 0]) -
+                 mean(sim$sales[sim$D == 0 & sim$Post == 0])
 
   # Model 1: no fixed effects
   fit1 <- lm(sales ~ D * Post, data = sim)
@@ -150,3 +155,5 @@ cat("Model 2 intervals containing 10:", round(100 * mean(in2_sims), 1), "%\n")
 cat("Model 1 intervals containing 10:", round(100 * mean(in1_sims), 1), "%\n")
 cat("Mean of estimator A:", round(mean(a_sims), 3), "\n")
 cat("SD of estimator A:", round(sd(a_sims), 3), "\n")
+cat("Mean of pre-campaign gap:", round(mean(gap_sims), 3), "\n")
+cat("SD of pre-campaign gap:", round(sd(gap_sims), 3), "\n")
