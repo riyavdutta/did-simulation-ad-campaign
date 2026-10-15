@@ -68,3 +68,29 @@ Seed 2026 is set once. The 1,000 datasets are drawn after the Session 2 dataset,
 - Share of Model 1 95% intervals containing +10: about 99.9% (between 99.5% and 100%)
 - Estimator A (week 3 versus week 4 only): mean about 10.0, SD about 2.8, because it uses two of the six weeks
 - The pre-campaign gap between the groups averages 0 across datasets but varies by about 3.2 units from dataset to dataset
+
+## Session 5: scenarios S2 and S3, 1,000 new datasets each (written before any code ran)
+
+Each scenario draws its own 1,000 new datasets in the same random stream after the Session 4 run (no new seed). S2 adds 3 * D * week to sales (extra weekly growth in advertised cities). S3 adds 10 * D * Post (an unrelated shock that starts with the campaign).
+
+S2:
+- Mean of d: about 19 (between 18.8 and 19.2), because the pre and post averages are 3 weeks apart, so the extra growth adds 3 * 3 = 9 to the true 10
+- SD of d: about 1.63 (between 1.5 and 1.75)
+- Mean Model 2 standard error: about 1.64 (between 1.55 and 1.75)
+- Mean Model 1 standard error: about 3.06 (between 2.95 and 3.2)
+- Model 2 intervals containing 10: about 0% (between 0% and 0.5%)
+- Model 1 intervals containing 10: about 3% (between 1.5% and 5%)
+- Mean of estimator A: about 13 (between 12.8 and 13.2); SD of estimator A: about 2.83 (between 2.7 and 2.95)
+- Pre-campaign gap: mean about 6.0 (between 5.8 and 6.2), SD about 3.2 (between 3.0 and 3.4)
+
+S3:
+- Mean of d: about 20 (between 19.8 and 20.2)
+- SD of d: about 1.63 (between 1.5 and 1.75)
+- Mean Model 2 standard error: about 1.63 (between 1.55 and 1.75)
+- Mean Model 1 standard error: about 3.0 (between 2.9 and 3.1)
+- Model 2 intervals containing 10: about 0% (between 0% and 0.5%)
+- Model 1 intervals containing 10: about 0.6% (between 0% and 1.5%)
+- Mean of estimator A: about 20 (between 19.8 and 20.2); SD of estimator A: about 2.83 (between 2.7 and 2.95)
+- Pre-campaign gap: mean about 0 (between -0.2 and 0.2), SD about 3.2 (between 3.0 and 3.4)
+
+In both scenarios the estimates are precise but wrong, and Model 2's intervals almost never contain the true effect.
