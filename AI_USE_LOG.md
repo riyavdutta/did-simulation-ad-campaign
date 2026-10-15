@@ -60,3 +60,18 @@
 - No regression and no replications this session.
 - I corrected the simulate.R commit message to cover both steps
   (f08933c).
+
+## Session 3: 2026-10-16
+
+### Environment
+- R 4.5.2 (2025-10-31), no packages installed. lm(), summary(), confint() and coef() are in base R's stats package.
+- Seed 2026, set once at the top of simulate.R. Run command: Rscript --vanilla simulate.R
+
+### AI actions
+- Added a Session 3 section to simulate.R (lines 70 to 99) that fits two regressions on the Session 2 dataset and checks the difference-in-differences estimates for equality.
+- Ran simulate.R once. Model 1: D:Post 9.54 (SE 2.97). Model 2: D:Post 9.54 (SE 1.61, 95% interval 6.37 to 12.71). Hand calculation, Model 1 and Model 2 all gave 9.543978.
+- Revised CLAUDE.md during this period; see git history.
+
+### Checks
+- Session 2 output reprinted unchanged. git status was clean before and after the run. Every result matched or fell inside the Session 3 predictions.
+- Commit 6029d27 holds both the predictions and the code, so git alone does not show the predictions came first.
