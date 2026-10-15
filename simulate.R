@@ -67,3 +67,33 @@ cat("Comparison cities, weeks 4 to 6:", round(cmp_post, 2), "\n")
 cat("Change, advertised:", round(change_adv, 2), "\n")
 cat("Change, comparison:", round(change_cmp, 2), "\n")
 cat("Difference-in-differences:", round(did, 2), "\n")
+
+# ---- Session 3: regressions on the same S1 dataset ----
+# Uses s1 and did from the Session 2 section above. The function is NOT
+# called again, because a second call would draw a different dataset.
+
+# Model 1: no fixed effects
+m1 <- lm(sales ~ D * Post, data = s1)
+m1_table <- summary(m1)$coefficients
+cat("\nModel 1: lm(sales ~ D * Post)\n")
+print(round(m1_table[, c("Estimate", "Std. Error")], 2))
+
+# Model 2: city and week fixed effects; print only the D:Post row
+m2 <- lm(sales ~ D:Post + factor(city) + factor(week), data = s1)
+m2_table <- summary(m2)$coefficients
+m2_ci    <- confint(m2)   # 95% intervals by default
+cat("\nModel 2: lm(sales ~ D:Post + factor(city) + factor(week))\n")
+cat("D:Post coefficient:", round(m2_table["D:Post", "Estimate"], 2), "\n")
+cat("Standard error:", round(m2_table["D:Post", "Std. Error"], 2), "\n")
+cat("95% interval:", round(m2_ci["D:Post", 1], 2), "to",
+    round(m2_ci["D:Post", 2], 2), "\n")
+
+# Are the three difference-in-differences estimates equal?
+d_hand <- did
+d_m1   <- unname(coef(m1)["D:Post"])
+d_m2   <- unname(coef(m2)["D:Post"])
+cat("\nHand DiD (Session 2):", round(d_hand, 6), "\n")
+cat("Model 1 D:Post:", round(d_m1, 6), "\n")
+cat("Model 2 D:Post:", round(d_m2, 6), "\n")
+all_equal <- isTRUE(all.equal(d_m1, d_hand)) && isTRUE(all.equal(d_m2, d_hand))
+cat("All three equal (up to computer rounding):", all_equal, "\n")
