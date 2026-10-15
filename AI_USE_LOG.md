@@ -75,3 +75,19 @@
 ### Checks
 - Session 2 output reprinted unchanged. git status was clean before and after the run. Every result matched or fell inside the Session 3 predictions.
 - Commit 6029d27 holds both the predictions and the code, so git alone does not show the predictions came first.
+
+## Session 4: 2026-10-16
+
+### Environment
+- R 4.5.2 (2025-10-31), no packages installed. lm() and confint() are in base R's stats package.
+- Seed 2026, set once at the top of simulate.R; the 1,000 datasets continue the stream after the Session 2 dataset. Run command: Rscript --vanilla simulate.R
+
+### AI actions
+- Appended the Session 4 predictions to PREDICTIONS.md as supplied and committed them (fce3428).
+- Added a Session 4 section to simulate.R (lines 101 to 159): 1,000 S1 datasets, each with d by hand, Model 1 and Model 2 standard errors and interval coverage, estimator A, and the pre-campaign gap.
+- Ran simulate.R once. Mean of d 10.042, SD 1.620. Mean SE: Model 2 1.631, Model 1 2.996. Intervals containing 10: Model 2 95.7%, Model 1 100%. Estimator A: mean 10.004, SD 2.845. Pre-campaign gap: mean 0.123, SD 3.043.
+
+### Checks
+- Predictions (fce3428) were committed and pushed before the Session 4 code (19da710, 72f52ff) and before the run.
+- Session 2 and 3 output reprinted unchanged. git status was clean before and after the run.
+- Nine of ten results matched or fell inside the predictions. The SD of the pre-campaign gap (3.043) was 0.16 below the predicted 3.2, about 2.4 standard errors, consistent with chance in one random stream.
