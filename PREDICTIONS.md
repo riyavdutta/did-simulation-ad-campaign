@@ -55,3 +55,16 @@ but Model 1 treats the 600 rows as unrelated and leaves the city effects
 in its error, so its standard error is nearly double. The city fixed
 effects remove each city's constant level, which gives the correct,
 smaller standard error.
+
+## Session 4: 1,000 simulated S1 datasets (written before any code ran)
+
+Seed 2026 is set once. The 1,000 datasets are drawn after the Session 2 dataset, in one continuous random stream. In each I compute the difference-in-differences d by hand (equal to Model 2's D:Post) and fit Model 1 and Model 2.
+
+- Mean of d across the 1,000 datasets: about 10.0 (between 9.9 and 10.1)
+- SD of d across the 1,000 datasets: about 1.63 (between 1.5 and 1.75)
+- Mean of Model 2's standard error: about 1.63, matching the SD of d
+- Mean of Model 1's standard error: about 3.0 (between 2.9 and 3.1), about 1.8 times the SD of d
+- Share of Model 2 95% intervals containing +10: about 95% (between 93.5% and 96.5%)
+- Share of Model 1 95% intervals containing +10: about 99.9% (between 99.5% and 100%)
+- Estimator A (week 3 versus week 4 only): mean about 10.0, SD about 2.8, because it uses two of the six weeks
+- The pre-campaign gap between the groups averages 0 across datasets but varies by about 3.2 units from dataset to dataset
