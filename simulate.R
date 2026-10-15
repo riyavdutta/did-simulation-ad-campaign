@@ -97,3 +97,56 @@ cat("Model 1 D:Post:", round(d_m1, 6), "\n")
 cat("Model 2 D:Post:", round(d_m2, 6), "\n")
 all_equal <- isTRUE(all.equal(d_m1, d_hand)) && isTRUE(all.equal(d_m2, d_hand))
 cat("All three equal (up to computer rounding):", all_equal, "\n")
+
+# ---- Session 4: 1,000 simulated S1 datasets ----
+# No set.seed here: these draws continue the random stream after the
+# Session 2 dataset. Names differ from Sessions 2 and 3 so nothing above
+# is overwritten.
+
+n_sims   <- 1000
+d_sims   <- numeric(n_sims)   # d by hand
+se1_sims <- numeric(n_sims)   # Model 1 standard error of D:Post
+se2_sims <- numeric(n_sims)   # Model 2 standard error of D:Post
+in1_sims <- logical(n_sims)   # Model 1 95% interval contains 10?
+in2_sims <- logical(n_sims)   # Model 2 95% interval contains 10?
+a_sims   <- numeric(n_sims)   # estimator A (week 3 versus week 4)
+
+for (i in 1:n_sims) {
+  sim <- build_s1_dataset()
+
+  # d: advertised post minus pre, minus comparison post minus pre
+  d_sims[i] <-
+    (mean(sim$sales[sim$D == 1 & sim$Post == 1]) -
+     mean(sim$sales[sim$D == 1 & sim$Post == 0])) -
+    (mean(sim$sales[sim$D == 0 & sim$Post == 1]) -
+     mean(sim$sales[sim$D == 0 & sim$Post == 0]))
+
+  # Model 1: no fixed effects
+  fit1 <- lm(sales ~ D * Post, data = sim)
+  se1_sims[i] <- summary(fit1)$coefficients["D:Post", "Std. Error"]
+  ci1 <- confint(fit1, parm = "D:Post")
+  in1_sims[i] <- ci1[1] <= 10 && 10 <= ci1[2]
+
+  # Model 2: city and week fixed effects
+  fit2 <- lm(sales ~ D:Post + factor(city) + factor(week), data = sim)
+  se2_sims[i] <- summary(fit2)$coefficients["D:Post", "Std. Error"]
+  ci2 <- confint(fit2, parm = "D:Post")
+  in2_sims[i] <- ci2[1] <= 10 && 10 <= ci2[2]
+
+  # Estimator A: the same comparison using week 3 and week 4 only
+  a_sims[i] <-
+    (mean(sim$sales[sim$D == 1 & sim$week == 4]) -
+     mean(sim$sales[sim$D == 1 & sim$week == 3])) -
+    (mean(sim$sales[sim$D == 0 & sim$week == 4]) -
+     mean(sim$sales[sim$D == 0 & sim$week == 3]))
+}
+
+cat("\nSession 4: 1,000 simulated S1 datasets\n")
+cat("Mean of d:", round(mean(d_sims), 3), "\n")
+cat("SD of d:", round(sd(d_sims), 3), "\n")
+cat("Mean Model 2 standard error:", round(mean(se2_sims), 3), "\n")
+cat("Mean Model 1 standard error:", round(mean(se1_sims), 3), "\n")
+cat("Model 2 intervals containing 10:", round(100 * mean(in2_sims), 1), "%\n")
+cat("Model 1 intervals containing 10:", round(100 * mean(in1_sims), 1), "%\n")
+cat("Mean of estimator A:", round(mean(a_sims), 3), "\n")
+cat("SD of estimator A:", round(sd(a_sims), 3), "\n")
