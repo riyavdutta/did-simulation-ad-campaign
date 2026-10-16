@@ -157,3 +157,95 @@ cat("Mean of estimator A:", round(mean(a_sims), 3), "\n")
 cat("SD of estimator A:", round(sd(a_sims), 3), "\n")
 cat("Mean of pre-campaign gap:", round(mean(gap_sims), 3), "\n")
 cat("SD of pre-campaign gap:", round(sd(gap_sims), 3), "\n")
+
+# ---- Session 5: scenarios S2 and S3, 1,000 new datasets each ----
+# No set.seed here: these draws continue the random stream after the
+# Session 4 run. S2's 1,000 datasets are drawn first, then S3's 1,000.
+
+# Runs 1,000 rounds. Each round builds an S1 dataset, adds add_term(sim)
+# to sales, and records the same ten quantities as the Session 4 block.
+# Everything made inside the function stays inside it, so nothing from
+# earlier sessions is overwritten.
+run_scenario <- function(add_term) {
+  n_rounds <- 1000
+  d_v   <- numeric(n_rounds)   # d by hand
+  se1_v <- numeric(n_rounds)   # Model 1 standard error of D:Post
+  se2_v <- numeric(n_rounds)   # Model 2 standard error of D:Post
+  in1_v <- logical(n_rounds)   # Model 1 95% interval contains 10?
+  in2_v <- logical(n_rounds)   # Model 2 95% interval contains 10?
+  a_v   <- numeric(n_rounds)   # estimator A (week 3 versus week 4)
+  gap_v <- numeric(n_rounds)   # pre-campaign gap, weeks 1 to 3
+
+  for (r in 1:n_rounds) {
+    sim <- build_s1_dataset()
+    sim$sales <- sim$sales + add_term(sim)
+
+    adv_pre  <- mean(sim$sales[sim$D == 1 & sim$Post == 0])
+    adv_post <- mean(sim$sales[sim$D == 1 & sim$Post == 1])
+    cmp_pre  <- mean(sim$sales[sim$D == 0 & sim$Post == 0])
+    cmp_post <- mean(sim$sales[sim$D == 0 & sim$Post == 1])
+
+    # d: advertised post minus pre, minus comparison post minus pre
+    d_v[r] <- (adv_post - adv_pre) - (cmp_post - cmp_pre)
+
+    # Pre-campaign gap: advertised minus comparison average, weeks 1 to 3
+    gap_v[r] <- adv_pre - cmp_pre
+
+    # Model 1: no fixed effects
+    fit1 <- lm(sales ~ D * Post, data = sim)
+    se1_v[r] <- summary(fit1)$coefficients["D:Post", "Std. Error"]
+    ci1 <- confint(fit1, parm = "D:Post")
+    in1_v[r] <- ci1[1] <= 10 && 10 <= ci1[2]
+
+    # Model 2: city and week fixed effects
+    fit2 <- lm(sales ~ D:Post + factor(city) + factor(week), data = sim)
+    se2_v[r] <- summary(fit2)$coefficients["D:Post", "Std. Error"]
+    ci2 <- confint(fit2, parm = "D:Post")
+    in2_v[r] <- ci2[1] <= 10 && 10 <= ci2[2]
+
+    # Estimator A: the same comparison using week 3 and week 4 only
+    a_v[r] <-
+      (mean(sim$sales[sim$D == 1 & sim$week == 4]) -
+       mean(sim$sales[sim$D == 1 & sim$week == 3])) -
+      (mean(sim$sales[sim$D == 0 & sim$week == 4]) -
+       mean(sim$sales[sim$D == 0 & sim$week == 3]))
+  }
+
+  c(mean_d   = mean(d_v),
+    sd_d     = sd(d_v),
+    mean_se2 = mean(se2_v),
+    mean_se1 = mean(se1_v),
+    in2_pct  = 100 * mean(in2_v),
+    in1_pct  = 100 * mean(in1_v),
+    mean_a   = mean(a_v),
+    sd_a     = sd(a_v),
+    mean_gap = mean(gap_v),
+    sd_gap   = sd(gap_v))
+}
+
+s5_labels <- c(mean_d   = "Mean of d",
+               sd_d     = "SD of d",
+               mean_se2 = "Mean Model 2 standard error",
+               mean_se1 = "Mean Model 1 standard error",
+               in2_pct  = "Model 2 intervals containing 10 (%)",
+               in1_pct  = "Model 1 intervals containing 10 (%)",
+               mean_a   = "Mean of estimator A",
+               sd_a     = "SD of estimator A",
+               mean_gap = "Mean of pre-campaign gap",
+               sd_gap   = "SD of pre-campaign gap")
+
+# S2: extra weekly growth in advertised cities
+s5_s2 <- run_scenario(function(sim) 3 * sim$D * sim$week)
+
+# S3: an unrelated shock that starts with the campaign
+s5_s3 <- run_scenario(function(sim) 10 * sim$D * sim$Post)
+
+cat("\nSession 5, S2: sales + 3 * D * week\n")
+for (s5_name in names(s5_labels)) {
+  cat(s5_labels[s5_name], ":", round(s5_s2[s5_name], 3), "\n")
+}
+
+cat("\nSession 5, S3: sales + 10 * D * Post\n")
+for (s5_name in names(s5_labels)) {
+  cat(s5_labels[s5_name], ":", round(s5_s3[s5_name], 3), "\n")
+}
