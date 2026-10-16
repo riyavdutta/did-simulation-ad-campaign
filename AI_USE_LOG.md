@@ -123,3 +123,15 @@
 - Session 6 code (b066525) was committed and pushed before the run. The run reached its last line (exit code not captured). Only the Session 5 S3 output was displayed and it matched the previous run, so the earlier random stream is inferred unchanged; earlier lines were not displayed. The only new item after the run was figures/.
 - All 18 means are within 0.10 of the Session 1 event-study predictions, about one standard error of a weekly mean (0.09, derived from the spec, not printed).
 - The figure has three panels with the mean, the 2.5th to 97.5th percentile band, a dashed line between weeks 3 and 4 and a line at 0; S2 shows a pre-trend in weeks 1 and 2.
+
+## Session 7: 2026-10-17
+
+### Environment
+- R 4.5.2 (2025-10-31), no packages installed, seed 2026. No R code was run this session.
+
+### AI actions
+- Wrote README.md under a one-off exception to rule 8, using the author's text word for word with one author-supplied correction to the Session 4 cell of the predictions table. Did not commit it.
+
+### Checks
+- Before writing, compared the README's results tables with the Session 4 to 6 output and its commit hashes with git log. All matched except the Session 4 cell, which attributed prediction lines to 72f52ff (a code-only commit); the author corrected it.
+- git diff showed README.md as the only changed file (2 lines removed, 86 added). It was committed and pushed as fe42f5f.
