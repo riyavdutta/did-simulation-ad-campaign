@@ -249,3 +249,65 @@ cat("\nSession 5, S3: sales + 10 * D * Post\n")
 for (s5_name in names(s5_labels)) {
   cat(s5_labels[s5_name], ":", round(s5_s3[s5_name], 3), "\n")
 }
+
+# ---- Session 6: event study for S1, S2 and S3, 1,000 new datasets each ----
+# No set.seed here: these draws continue the random stream after the
+# Session 5 run. S1's 1,000 datasets are drawn first, then S2's, then S3's.
+
+# For each of 1,000 datasets: the advertised-minus-comparison gap in each
+# week 1 to 6, minus the week 3 gap. Returns a 1,000 by 6 matrix, one row
+# per dataset and one column per week.
+run_event_study <- function(add_term) {
+  n_rounds <- 1000
+  es <- matrix(0, nrow = n_rounds, ncol = 6)
+
+  for (r in 1:n_rounds) {
+    sim <- build_s1_dataset()
+    sim$sales <- sim$sales + add_term(sim)
+
+    gap_by_week <- numeric(6)
+    for (w in 1:6) {
+      gap_by_week[w] <- mean(sim$sales[sim$D == 1 & sim$week == w]) -
+                        mean(sim$sales[sim$D == 0 & sim$week == w])
+    }
+    es[r, ] <- gap_by_week - gap_by_week[3]
+  }
+
+  es
+}
+
+s6_s1 <- run_event_study(function(sim) rep(0, nrow(sim)))      # S1
+s6_s2 <- run_event_study(function(sim) 3 * sim$D * sim$week)   # S2
+s6_s3 <- run_event_study(function(sim) 10 * sim$D * sim$Post)  # S3
+
+# Mean and 2.5th and 97.5th percentiles across the 1,000 datasets, per week
+s6_mean <- rbind(S1 = colMeans(s6_s1),
+                 S2 = colMeans(s6_s2),
+                 S3 = colMeans(s6_s3))
+s6_lo   <- rbind(S1 = apply(s6_s1, 2, quantile, probs = 0.025),
+                 S2 = apply(s6_s2, 2, quantile, probs = 0.025),
+                 S3 = apply(s6_s3, 2, quantile, probs = 0.025))
+s6_hi   <- rbind(S1 = apply(s6_s1, 2, quantile, probs = 0.975),
+                 S2 = apply(s6_s2, 2, quantile, probs = 0.975),
+                 S3 = apply(s6_s3, 2, quantile, probs = 0.975))
+colnames(s6_mean) <- paste("Week", 1:6)
+
+cat("\nSession 6: event study, mean of (week gap minus week 3 gap)\n")
+print(round(s6_mean, 2))
+
+# Figure: three panels, saved to figures/event_study.png in this project
+dir.create("figures", showWarnings = FALSE)
+png(file.path("figures", "event_study.png"),
+    width = 1500, height = 500, res = 120)
+par(mfrow = c(1, 3))
+for (s6_sc in c("S1", "S2", "S3")) {
+  plot(1:6, s6_mean[s6_sc, ], type = "b", pch = 19,
+       ylim = range(s6_lo, s6_hi),
+       xlab = "Week", ylab = "Gap minus week 3 gap", main = s6_sc)
+  lines(1:6, s6_lo[s6_sc, ], lty = 2)   # 2.5th percentile
+  lines(1:6, s6_hi[s6_sc, ], lty = 2)   # 97.5th percentile
+  abline(v = 3.5, lty = 2)              # campaign starts after week 3
+  abline(h = 0)
+}
+invisible(dev.off())
+cat("Figure saved: figures/event_study.png\n")
