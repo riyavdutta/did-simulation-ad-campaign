@@ -107,3 +107,19 @@
 - Predictions (285c598) were committed and pushed before the Session 5 code (0bdc50d), and both before the run. git status was clean before and after the run; Sessions 2 to 4 output reprinted unchanged.
 - 19 of 20 results fell inside the predicted ranges. S3's mean pre-campaign gap (0.219) was 0.019 above the range (-0.2 to 0.2), about 2.1 standard errors from 0, consistent with chance; S3's added term is 0 before the campaign.
 - S2's SD of d (1.703) and SD of the gap (3.354) were inside their ranges but about 2 standard errors above theory.
+
+## Session 6: 2026-10-17
+
+### Environment
+- R 4.5.2 (2025-10-31), no packages installed. png(), plot() and quantile() are in base R (grDevices, graphics, stats).
+- Seed 2026, set once at the top of simulate.R; S1, S2 and S3 then draw 1,000 datasets each, continuing the stream after Session 5. Run command: Rscript --vanilla simulate.R
+
+### AI actions
+- Added a Session 6 section to simulate.R (lines 253 to 313) with run_event_study(add_term), run for S1 (nothing added), S2 (3 * D * week) and S3 (10 * D * Post).
+- Ran simulate.R once. Means relative to week 3, weeks 1 to 6: S1 0.01, -0.05, 0, 10.10, 9.92, 10.02; S2 -6.00, -3.09, 0, 12.97, 15.91, 18.94; S3 -0.04, -0.09, 0, 19.99, 19.96, 20.00. Saved figures/event_study.png.
+- Committed figures/event_study.png (c58d729).
+
+### Checks
+- Session 6 code (b066525) was committed and pushed before the run. The run reached its last line (exit code not captured). Only the Session 5 S3 output was displayed and it matched the previous run, so the earlier random stream is inferred unchanged; earlier lines were not displayed. The only new item after the run was figures/.
+- All 18 means are within 0.10 of the Session 1 event-study predictions, about one standard error of a weekly mean (0.09, derived from the spec, not printed).
+- The figure has three panels with the mean, the 2.5th to 97.5th percentile band, a dashed line between weeks 3 and 4 and a line at 0; S2 shows a pre-trend in weeks 1 and 2.
